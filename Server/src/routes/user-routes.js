@@ -1,11 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user-controller");
-
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-
 const { body } = require("express-validator");
+const {authUser} = require("../middlewares/user-middleware");
 
 // Register a new user
 router.post(
@@ -17,7 +14,7 @@ router.post(
       .isLength({ min: 8 })
       .withMessage("Password must be at least 8 characters long"),
   ],
-  userController.register
+  userController.registerUser
 );
 
 // Login an existing user
@@ -27,13 +24,13 @@ router.post(
     body("email").isEmail().withMessage("Please enter a valid email"),
     body("password").notEmpty().withMessage("Password is required"),
   ],
-  userController.login
+  userController.loginUser
 );
 
 // Get user profile
-router.get("/profile", userController.getProfile);
+router.get("/profile", authUser, userController.getProfile);
 
 //Logout an existing user
-router.get("/logout", userController.logout);
+router.get("/logout", authUser, userController.logout);
 
 module.exports = router;
